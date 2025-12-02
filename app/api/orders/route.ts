@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     const body = await request.json();
-    const { userId, items, shippingAddress, subtotal, shipping, tax, total, paymentMethod } = body;
+    const { userId, userName, userEmail, items, shippingAddress, subtotal, shipping, tax, total, paymentMethod } = body;
 
     if (!userId || !items || !shippingAddress) {
       return NextResponse.json(
@@ -21,6 +21,8 @@ export async function POST(request: NextRequest) {
 
     const order = await Order.create({
       userId,
+      userName: userName || 'Customer',
+      userEmail: userEmail || '',
       items,
       shippingAddress,
       subtotal,
@@ -61,25 +63,82 @@ export async function GET(request: NextRequest) {
     await connectDB();
 
     const userId = request.nextUrl.searchParams.get('userId');
-    if (!userId) {
-      return NextResponse.json(
-        { success: false, error: 'userId is required' },
-        { status: 400 }
-      );
+    const adminQuery = request.nextUrl.searchParams.get('admin');
+
+    // If admin is requesting all orders
+    if (adminQuery === 'true') {
+      const orders = await Order.find({}).sort({ createdAt: -1 });
+      
+      return NextResponse.json({
+        success: true,
+        data: orders,
+      });
     }
 
-    const orders = await Order.find({ userId }).sort({ createdAt: -1 });
+    // If userId is provided, get user-specific orders
+    if (userId) {
+      const orders = await Order.find({ userId }).sort({ createdAt: -1 });
 
-    return NextResponse.json({
-      success: true,
-      orders,
-    });
+      return NextResponse.json({
+        success: true,
+        orders,
+      });
+    }
+
+    return NextResponse.json(
+      { success: false, error: 'userId or admin flag is required' },
+      { status: 400 }
+    );
   } catch (error) {
     console.error('Error fetching orders:', error);
     return NextResponse.json(
       {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to fetch orders',
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    await connectDB();
+
+    const body = await request.json();
+    const { orderId, status } = body;
+
+    if (!orderId || !status) {
+      return NextResponse.json(
+        { success: false, error: 'orderId and status are required' },
+        { status: 400 }
+      );
+    }
+
+    const order = await Order.findByIdAndUpdate(
+      orderId,
+      { status },
+      { new: true }
+    );
+
+    if (!order) {
+      return NextResponse.json(
+        { success: false, error: 'Order not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Order status updated successfully',
+      order,
+    });
+  } catch (error) {
+    console.error('Error updating order:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to update order',
       },
       { status: 500 }
     );

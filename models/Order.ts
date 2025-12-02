@@ -12,6 +12,14 @@ const OrderSchema = new mongoose.Schema(
       unique: true,
       required: true,
     },
+    userName: {
+      type: String,
+      default: '',
+    },
+    userEmail: {
+      type: String,
+      default: '',
+    },
     items: [
       {
         productId: {
@@ -20,6 +28,7 @@ const OrderSchema = new mongoose.Schema(
         },
         quantity: Number,
         price: Number,
+        name: String,
         selectedSize: String,
         selectedColor: String,
         selectedLens: String,
@@ -59,7 +68,7 @@ const OrderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
+      enum: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'],
       default: 'pending',
     },
   },

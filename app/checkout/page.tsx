@@ -250,7 +250,8 @@ export default function CheckoutPage() {
     setShowAddressForm(false);
     setIsEditingAddressInCheckout(null);
     setFormErrors({});
-    if (selectedAddressIndex !== null) {
+    // Only restore address if we have saved addresses and a valid index
+    if (savedAddresses.length > 0 && selectedAddressIndex !== null) {
       setShippingForm(savedAddresses[selectedAddressIndex]);
     }
   };
@@ -292,6 +293,8 @@ export default function CheckoutPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: user.id,
+          userName: user.name || shippingForm.fullName || 'Customer',
+          userEmail: user.email || shippingForm.email || '',
           items: cartItems,
           shippingAddress: shippingForm,
           subtotal,
@@ -786,12 +789,15 @@ export default function CheckoutPage() {
                 )}
 
                 {/* Address Form - Add/Edit */}
-                {(showAddressForm || (savedAddresses.length === 0 && !useNewAddress)) && (
+                {(showAddressForm || savedAddresses.length === 0) && (
                   <div className="space-y-6 bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl border-2 border-blue-200 shadow-sm">
                     <div className="border-b border-blue-100 pb-6 mb-6">
                       <h3 className="text-2xl font-light text-gray-900">
                         {isEditingAddressInCheckout !== null ? <><Edit2 size={16} /> Edit Address</> : <><Plus size={16} /> Add New Address</>}
                       </h3>
+                      {savedAddresses.length === 0 && (
+                        <p className="text-sm text-blue-600 mt-2">No addresses saved. Please add a shipping address to continue.</p>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-blue-50 pb-6">
@@ -1012,13 +1018,26 @@ export default function CheckoutPage() {
                       >
                         <Save size={16} className="inline-block mr-2" /> {isEditingAddressInCheckout !== null ? 'Update Address' : 'Save Address'}
                       </button>
-                      <button
-                        onClick={handleCancelAddressForm}
-                        className="flex-1 py-3 bg-gray-300 text-gray-900 rounded-lg hover:bg-gray-400 transition-all font-semibold"
-                      >
-                        ✕ Cancel
-                      </button>
+                      {savedAddresses.length > 0 && (
+                        <button
+                          onClick={handleCancelAddressForm}
+                          className="flex-1 py-3 bg-gray-300 text-gray-900 rounded-lg hover:bg-gray-400 transition-all font-semibold"
+                        >
+                          ✕ Cancel
+                        </button>
+                      )}
                     </div>
+                    
+                    {/* Proceed button when form is saved */}
+                    {savedAddresses.length === 0 && (
+                      <button
+                        onClick={() => setStep('payment')}
+                        className="w-full py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium flex items-center justify-center gap-2 mt-4"
+                      >
+                        Proceed to Payment
+                        <ArrowLeft className="rotate-180" size={16} />
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
