@@ -225,7 +225,7 @@ export default function Home() {
             </Link>
 
             {/* Actions with Hover Effects */}
-            <div className="flex items-center gap-4 lg:gap-6">
+            <div className="flex items-center gap-2 lg:gap-4">
               <Link href="/search" className="p-2 hover:bg-gray-100/50 rounded-full transition-all duration-300 group relative">
                 <Search size={20} className="text-gray-600 group-hover:text-blue-600 transition-colors" />
                 <div className="absolute inset-0 rounded-full border border-transparent group-hover:border-blue-100 transition-all duration-300"></div>
@@ -240,21 +240,41 @@ export default function Home() {
                 )}
               </Link>
               
-              <button 
-                onClick={() => setIsCartOpen(true)}
-                className="p-2 hover:bg-gray-100/50 rounded-full transition-all duration-300 group relative"
-              >
-                <ShoppingBag size={20} className="text-gray-600 group-hover:text-gray-900 transition-colors" />
-                {cartItems.length > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-gray-900 to-gray-700 text-white text-xs rounded-full flex items-center justify-center animate-bounce font-bold">
-                    {cartItems.length > 9 ? '9+' : cartItems.length}
-                  </span>
-                )}
-              </button>
+              {user ? (
+                <button 
+                  onClick={() => setIsCartOpen(true)}
+                  className="p-2 hover:bg-gray-100/50 rounded-full transition-all duration-300 group relative"
+                >
+                  <ShoppingBag size={20} className="text-gray-600 group-hover:text-gray-900 transition-colors" />
+                  {cartItems.length > 0 && (
+                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-gray-900 to-gray-700 text-white text-xs rounded-full flex items-center justify-center animate-bounce font-bold">
+                      {cartItems.length > 9 ? '9+' : cartItems.length}
+                    </span>
+                  )}
+                </button>
+              ) : null}
+
+              {/* Auth Buttons - Desktop */}
+              {!user && (
+                <div className="hidden sm:flex items-center gap-3 ml-2 lg:ml-4">
+                  <Link 
+                    href="/login" 
+                    className="px-4 py-2 text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition-all duration-300"
+                  >
+                    Sign In
+                  </Link>
+                  <Link 
+                    href="/register" 
+                    className="px-5 py-2 bg-gradient-to-r from-gray-900 to-gray-800 text-white font-medium rounded-lg hover:shadow-lg hover:shadow-gray-900/20 transition-all duration-300 transform hover:scale-105"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              )}
               
               <button 
                 onClick={() => setIsMenuOpen(true)}
-                className="p-2 hover:bg-gray-100/50 rounded-full transition-all duration-300 group relative"
+                className="p-2 hover:bg-gray-100/50 rounded-full transition-all duration-300 group relative ml-2"
               >
                 <Menu size={24} className="text-gray-600 group-hover:text-gray-900 transition-colors" />
               </button>
