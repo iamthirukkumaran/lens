@@ -403,7 +403,7 @@ export default function Home() {
       )}
 
       {/* Enhanced Gallery Section */}
-      <section className="py-24 lg:py-32 px-6 lg:px-8 mt-16 lg:mt-20">
+      <section className="py-24 lg:py-32 px-6 lg:px-8 mt-13 lg:mt-13">
         <div className="max-w-7xl mx-auto">
           {/* Header with Animation */}
          
