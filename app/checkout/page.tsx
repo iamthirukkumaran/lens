@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Trash2, AlertCircle, CheckCircle, Lock, CreditCard, Building, Wallet, Edit2, Save, X, Plus } from 'lucide-react';
+import { ArrowLeft, Trash2, AlertCircle, CheckCircle, Lock, CreditCard, Building, Wallet, Edit2, Save, X, Plus, Box } from 'lucide-react';
 
 interface CartItem {
   _id: string;
@@ -672,15 +672,31 @@ export default function CheckoutPage() {
               <div className="space-y-6">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-light text-gray-900">Shipping Details</h2>
-                  {savedAddresses.length > 0 && (
+                  {savedAddresses.length > 0 && !showAddressForm && (
                     <button
-                      onClick={() => setUseNewAddress(!useNewAddress)}
-                      className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                      onClick={() => setShowAddressForm(true)}
+                      className="text-sm text-blue-600 hover:text-blue-800 transition-colors font-medium"
                     >
-                      {useNewAddress ? 'Use saved address' : 'Add new address'}
+                      + Add Another Address
                     </button>
                   )}
                 </div>
+
+                {/* No Addresses - Show Add Address Button Prominently */}
+                {savedAddresses.length === 0 && !showAddressForm && (
+                  <div className="text-center py-12 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border-2 border-dashed border-blue-300">
+                    <Box size={48} className="mx-auto text-blue-400 mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No Shipping Addresses Added</h3>
+                    <p className="text-gray-600 mb-6">Add your first shipping address to continue with checkout</p>
+                    <button
+                      onClick={() => setShowAddressForm(true)}
+                      className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:shadow-lg transition-all font-medium text-lg"
+                    >
+                      <Plus size={20} />
+                      Add Shipping Address
+                    </button>
+                  </div>
+                )}
 
                 {/* Saved Addresses */}
                 {savedAddresses.length > 0 && !showAddressForm && (
