@@ -481,9 +481,9 @@ export default function CheckoutPage() {
 
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 border-t border-gray-100 pt-8">
           {/* Left: Form */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 border-r border-gray-100 pr-8">
             {/* Steps Indicator */}
             <div className="flex items-center justify-between mb-8 relative">
               <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gray-200 -translate-y-1/2 -z-10"></div>
@@ -572,7 +572,7 @@ export default function CheckoutPage() {
                   </div>
                 ) : (
                   <>
-                    <div className="space-y-4">
+                    <div className="space-y-4 border-b border-gray-100 pb-6">
                       {cartItems.map((item) => (
                         <div key={item._id} className="flex gap-4 p-6 bg-white rounded-xl border border-gray-100 hover:shadow-md transition-all duration-300">
                           <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
@@ -681,7 +681,7 @@ export default function CheckoutPage() {
 
                 {/* Saved Addresses */}
                 {savedAddresses.length > 0 && !showAddressForm && (
-                  <div className="space-y-4 mb-8">
+                  <div className="space-y-4 mb-8 border-b border-gray-100 pb-8">
                     <p className="text-sm font-medium text-gray-700">Select a saved address or manage your addresses</p>
                     <div className="space-y-3">
                       {savedAddresses.map((address, index) => (
@@ -788,11 +788,13 @@ export default function CheckoutPage() {
                 {/* Address Form - Add/Edit */}
                 {(showAddressForm || (savedAddresses.length === 0 && !useNewAddress)) && (
                   <div className="space-y-6 bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl border-2 border-blue-200 shadow-sm">
-                    <h3 className="text-2xl font-light text-gray-900">
-                      {isEditingAddressInCheckout !== null ? <><Edit2 size={16} /> Edit Address</> : <><Plus size={16} /> Add New Address</>}
-                    </h3>
+                    <div className="border-b border-blue-100 pb-6 mb-6">
+                      <h3 className="text-2xl font-light text-gray-900">
+                        {isEditingAddressInCheckout !== null ? <><Edit2 size={16} /> Edit Address</> : <><Plus size={16} /> Add New Address</>}
+                      </h3>
+                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-blue-50 pb-6">
                       <div id={`shipping-fullName`} className="space-y-2">
                         <label className="block text-sm font-medium text-gray-700">
                           Full Name <span className="text-red-500">*</span>
@@ -842,7 +844,7 @@ export default function CheckoutPage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-blue-50 pb-6">
                       <div id={`shipping-phone`} className="space-y-2">
                         <label className="block text-sm font-medium text-gray-700">
                           Phone Number <span className="text-red-500">*</span>
@@ -892,7 +894,7 @@ export default function CheckoutPage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-blue-50 pb-6">
                       <div id={`shipping-city`} className="space-y-2">
                         <label className="block text-sm font-medium text-gray-700">
                           City <span className="text-red-500">*</span>
@@ -942,7 +944,7 @@ export default function CheckoutPage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-blue-100 pb-6 mb-6">
                       <div id={`shipping-zipCode`} className="space-y-2">
                         <label className="block text-sm font-medium text-gray-700">
                           ZIP Code <span className="text-red-500">*</span>
@@ -1027,7 +1029,7 @@ export default function CheckoutPage() {
               <div className="space-y-6">
                 <h2 className="text-2xl font-light text-gray-900 mb-6">Payment Method</h2>
 
-                <div className="space-y-4 bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+                <div className="space-y-4 bg-white p-8 rounded-2xl border border-gray-100 shadow-sm border-t border-gray-200">
                   <label className={`flex items-center gap-4 p-6 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
                     paymentMethod === 'credit_card' 
                       ? 'border-gray-900 bg-gray-50' 
@@ -1126,7 +1128,7 @@ export default function CheckoutPage() {
           </div>
 
           {/* Right: Order Summary */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 border-l border-gray-100 pl-8">
             <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm sticky top-24">
               <h3 className="text-lg font-semibold text-gray-900 mb-6">Order Summary</h3>
 
@@ -1142,7 +1144,7 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
-              <div className="space-y-3 mb-6 pb-6 border-b border-gray-200">
+              <div className="space-y-3 mb-6 pb-6 border-b border-gray-200 border-t border-gray-100 pt-4">
                 <div className="flex justify-between text-sm text-gray-600">
                   <span>Subtotal</span>
                   <span>₹{subtotal.toFixed(2)}</span>
@@ -1159,7 +1161,7 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              <div className="flex justify-between items-center text-lg font-bold text-gray-900 mb-6">
+              <div className="flex justify-between items-center text-lg font-bold text-gray-900 mb-6 border-t border-gray-100 pt-4">
                 <span>Total</span>
                 <span>₹{total.toFixed(2)}</span>
               </div>

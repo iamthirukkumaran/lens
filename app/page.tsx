@@ -403,7 +403,7 @@ export default function Home() {
       )}
 
       {/* Enhanced Gallery Section */}
-      <section className="py-24 lg:py-32 px-6 lg:px-8">
+      <section className="py-24 lg:py-32 px-6 lg:px-8 mt-16 lg:mt-20">
         <div className="max-w-7xl mx-auto">
           {/* Header with Animation */}
          
@@ -596,7 +596,7 @@ export default function Home() {
       </section>
 
       {/* Enhanced Features Section */}
-      <section className="py-20 lg:py-32 px-6 lg:px-8">
+      <section className="py-2 lg:py-2 px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16 lg:mb-24">
             <div className="inline-flex items-center gap-4 mb-6">
@@ -681,11 +681,11 @@ export default function Home() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </div >
+      </section >
 
       {/* Enhanced CTA Section */}
-      <section className="py-20 lg:py-32 px-6 lg:px-8">
+      <section className="py-12 lg:py-13 px-6 lg:px-8 ">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-4 mb-6">
             <Sparkles className="text-yellow-500 animate-pulse" size={24} />
