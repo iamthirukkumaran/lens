@@ -11,6 +11,7 @@ export async function GET(req: NextRequest) {
     const brands = searchParams.getAll('brand');
     const materials = searchParams.getAll('material');
     const sizes = searchParams.getAll('size');
+    const colors = searchParams.getAll('color');
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '12');
 
@@ -20,6 +21,7 @@ export async function GET(req: NextRequest) {
     if (brands.length > 0) filter.brand = { $in: brands };
     if (materials.length > 0) filter.material = { $in: materials };
     if (sizes.length > 0) filter.sizes = { $in: sizes };
+    if (colors.length > 0) filter.colors = { $in: colors };
 
     const skip = (page - 1) * limit;
 
