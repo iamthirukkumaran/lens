@@ -162,22 +162,6 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* Role Selection */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-3">
-                Register as
-              </label>
-              <select
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-gray-900 focus:outline-none transition-colors"
-              >
-                <option value="customer">Customer (Buy Products)</option>
-                <option value="admin">Admin (Manage Products)</option>
-              </select>
-            </div>
-
             {/* Password Field */}
             <div>
               <label className="block text-sm font-semibold text-gray-900 mb-3">
