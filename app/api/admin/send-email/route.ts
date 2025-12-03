@@ -4,7 +4,7 @@ import nodemailer from 'nodemailer';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { to, subject, orderStatus, orderDetails, userName } = body;
+    const { to, subject, orderDetails, userName, message } = body;
 
     if (!to || !subject) {
       return NextResponse.json(
@@ -13,23 +13,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate HTML email content based on status
-    const statusMessages: { [key: string]: string } = {
-      'confirmed': 'Your order has been confirmed and will be processed soon.',
-      'processing': 'We are processing your order. Thank you for your patience.',
-      'shipped': 'Great news! Your order has been shipped and is on its way!',
-      'delivered': 'Your order has been delivered. Thank you for shopping with us!',
-      'cancelled': 'Your order has been cancelled. If you have any questions, please contact us.',
-    };
-
-    const statusEmojis: { [key: string]: string } = {
-      'confirmed': '✓',
-      'processing': '⚙️',
-      'shipped': '🚚',
-      'delivered': '🎉',
-      'cancelled': '✕',
-    };
-
+    // Generate HTML email content
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -39,43 +23,54 @@ export async function POST(request: NextRequest) {
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
             .header { background-color: #1f2937; color: white; padding: 20px; border-radius: 8px; }
             .content { padding: 20px; background-color: #f9fafb; border-radius: 8px; margin-top: 20px; }
-            .status { font-size: 24px; font-weight: bold; color: #1f2937; margin-top: 10px; }
+            .message { font-size: 16px; color: #374151; line-height: 1.6; }
             .order-details { background-color: white; padding: 15px; border-radius: 5px; margin-top: 15px; }
             .item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e5e7eb; }
             .footer { text-align: center; color: #6b7280; font-size: 12px; margin-top: 20px; }
             .total { font-weight: bold; font-size: 18px; color: #1f2937; padding: 15px 0; }
+            .tracking { background-color: #f0fdf4; padding: 10px; border-radius: 5px; margin-top: 10px; border-left: 4px solid #22c55e; }
           </style>
         </head>
         <body>
           <div class="container">
             <div class="header">
               <h1>Hub of Frames</h1>
-              <p>Order Status Update</p>
+              <p>Order Update</p>
             </div>
 
             <div class="content">
               <h2>Hello ${userName},</h2>
-              <p>${statusMessages[orderStatus] || 'Your order status has been updated.'}</p>
+              <p class="message">${message}</p>
               
-              <div class="status">
-                ${statusEmojis[orderStatus]} ${orderStatus.charAt(0).toUpperCase() + orderStatus.slice(1)}
-              </div>
-
               <div class="order-details">
                 <h3>Order Details</h3>
                 <p><strong>Order ID:</strong> ${orderDetails.orderId}</p>
                 
-                <h4>Items:</h4>
-                ${orderDetails.items.map((item: any) => `
-                  <div class="item">
-                    <span>${item.name} x ${item.quantity}</span>
-                    <span>$${(item.price * item.quantity).toFixed(2)}</span>
-                  </div>
-                `).join('')}
+                ${orderDetails.items && orderDetails.items.length > 0 ? `
+                  <h4>Items:</h4>
+                  ${orderDetails.items.map((item: any) => {
+                    const itemName = item.name || 'Product';
+                    const itemQty = item.quantity || 1;
+                    const itemPrice = item.price || 0;
+                    const itemTotal = (itemPrice * itemQty).toFixed(2);
+                    return `
+                      <div class="item">
+                        <span>${itemName} x ${itemQty}</span>
+                        <span>$${itemTotal}</span>
+                      </div>
+                    `;
+                  }).join('')}
+                ` : ''}
                 
                 <div class="total">
                   Total Amount: $${orderDetails.totalAmount.toFixed(2)}
                 </div>
+
+                ${orderDetails.trackingNumber ? `
+                  <div class="tracking">
+                    <strong>Tracking Number:</strong> ${orderDetails.trackingNumber}
+                  </div>
+                ` : ''}
               </div>
 
               <p style="margin-top: 20px; color: #6b7280;">
@@ -110,7 +105,7 @@ export async function POST(request: NextRequest) {
 
     await transporter.sendMail(mailOptions);
 
-    console.log(`Email sent successfully to ${to} - Status: ${orderStatus}`);
+    console.log(`Email sent successfully to ${to} - Subject: ${subject}`);
 
     return NextResponse.json({
       success: true,
