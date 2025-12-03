@@ -824,19 +824,19 @@ export default function AnalyticsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="bg-white/5 rounded-xl p-6 border border-white/10 hover:bg-white/10 transition-colors">
                     <p className="text-sm text-gray-300 mb-3 font-medium">Average Order Value</p>
-                    <p className="text-3xl font-bold text-blue-300">{formatCurrency(countedAverageOrderValue)}</p>
+                    <p className="text-3xl font-bold text-blue-300">{formatCurrency(analytics.averageOrderValue)}</p>
                     <p className="text-xs text-gray-400 mt-2">Per transaction</p>
                   </div>
                   
                   <div className="bg-white/5 rounded-xl p-6 border border-white/10 hover:bg-white/10 transition-colors">
                     <p className="text-sm text-gray-300 mb-3 font-medium">Total Revenue</p>
-                    <p className="text-3xl font-bold text-green-300">{formatCurrency(countedRevenue)}</p>
+                    <p className="text-3xl font-bold text-green-300">{formatCurrency(analytics.totalRevenue)}</p>
                     <p className="text-xs text-gray-400 mt-2">Generated</p>
                   </div>
                   
                   <div className="bg-white/5 rounded-xl p-6 border border-white/10 hover:bg-white/10 transition-colors">
                     <p className="text-sm text-gray-300 mb-3 font-medium">Total Orders</p>
-                    <p className="text-3xl font-bold text-purple-300">{countedOrders.toLocaleString()}</p>
+                    <p className="text-3xl font-bold text-purple-300">{analytics.totalOrders.toLocaleString()}</p>
                     <p className="text-xs text-gray-400 mt-2">Completed</p>
                   </div>
                 </div>
