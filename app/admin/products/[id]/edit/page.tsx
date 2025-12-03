@@ -69,19 +69,19 @@ export default function EditProductPage() {
       try {
         const response = await fetch(`/api/products/${productId}`);
         const data = await response.json();
-        if (data.success && data.product) {
+        if (data.success && data.data) {
           setFormData({
-            name: data.product.name || '',
-            price: data.product.price || 0,
-            mrp: data.product.mrp || 0,
-            discount: data.product.discount || 0,
-            gender: data.product.gender || 'men',
-            brand: data.product.brand || '',
-            material: data.product.material || 'plastic',
-            colors: data.product.colors || [],
-            sizes: data.product.sizes || [],
-            images: data.product.images || [],
-            description: data.product.description || '',
+            name: data.data.name || '',
+            price: data.data.price || 0,
+            mrp: data.data.mrp || 0,
+            discount: data.data.discount || 0,
+            gender: data.data.gender || 'men',
+            brand: data.data.brand || '',
+            material: data.data.material || 'plastic',
+            colors: data.data.colors || [],
+            sizes: data.data.sizes || [],
+            images: data.data.images || [],
+            description: data.data.description || '',
           });
         }
       } catch (err) {
