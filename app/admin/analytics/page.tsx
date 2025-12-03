@@ -240,31 +240,73 @@ export default function AnalyticsPage() {
   const handleExport = async () => {
     setExporting(true);
     try {
-      const response = await fetch('/api/admin/analytics/export', {
+      // Get user data from localStorage for authentication
+      const userData = localStorage.getItem('user');
+      if (!userData) {
+        setError('Authentication required');
+        setExporting(false);
+        return;
+      }
+
+      const response = await fetch('/api/admin/analytics', {
+        method: 'GET',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         }
       });
       
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `analytics-report-${format(new Date(), 'yyyy-MM-dd')}.xlsx`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-        
-        setSuccess('Report exported successfully');
-        setTimeout(() => setSuccess(''), 3000);
-      }
+      if (!response.ok) throw new Error('Failed to fetch analytics data');
+      
+      const data = await response.json();
+      
+      // Create CSV content
+      const csvContent = generateCSV(data);
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `analytics-report-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      
+      setSuccess('Report exported successfully');
+      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError('Failed to export report');
+      setError(err instanceof Error ? err.message : 'Failed to export report');
     } finally {
       setExporting(false);
     }
+  };
+
+  const generateCSV = (data: AnalyticsData) => {
+    const lines = [];
+    lines.push('Analytics Report');
+    lines.push(`Generated: ${format(new Date(), 'MMM d, yyyy h:mm a')}`);
+    lines.push('');
+    
+    lines.push('Key Metrics');
+    lines.push(`Total Revenue,${formatCurrency(data.totalRevenue)}`);
+    lines.push(`Total Orders,${data.totalOrders}`);
+    lines.push(`Total Products,${data.totalProducts}`);
+    lines.push(`Average Order Value,${formatCurrency(data.averageOrderValue)}`);
+    lines.push('');
+    
+    lines.push('Monthly Data');
+    lines.push('Month,Orders,Revenue');
+    data.ordersByMonth?.forEach(month => {
+      lines.push(`${month.month},${month.orders},${month.revenue}`);
+    });
+    lines.push('');
+    
+    lines.push('Top Selling Products');
+    lines.push('Product,Units Sold,Revenue');
+    data.topSellingProducts?.forEach(product => {
+      lines.push(`${product.name},${product.sold},${product.revenue}`);
+    });
+    
+    return lines.join('\n');
   };
 
   const formatCurrency = (value: number) => {
