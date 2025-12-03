@@ -196,7 +196,7 @@ export default function AdminDashboard() {
     }, 10000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchDashboardStats]);
 
   const fetchProducts = async () => {
     try {
@@ -223,7 +223,7 @@ export default function AdminDashboard() {
     }
   };
 
-  const fetchDashboardStats = async () => {
+  const fetchDashboardStats = useCallback(async () => {
     try {
       const response = await fetch('/api/admin/stats');
       if (response.ok) {
@@ -234,7 +234,7 @@ export default function AdminDashboard() {
     } catch (err) {
       console.error('Error fetching stats:', err);
     }
-  };
+  }, []);
 
   // Debounced search
   const debouncedSearch = useMemo(
