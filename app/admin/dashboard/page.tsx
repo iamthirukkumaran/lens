@@ -112,11 +112,11 @@ export default function AdminDashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  // Counting animation hooks
-  const countedProducts = useCounter(stats.totalProducts, 1000);
-  const countedOrders = useCounter(stats.totalOrders, 1000);
-  const countedRevenue = useCounter(stats.totalRevenue, 1500);
-  const countedPendingOrders = useCounter(stats.pendingOrders, 1000);
+  // Counting animation hooks - reduced duration for faster visual feedback
+  const countedProducts = useCounter(stats.totalProducts, 800);
+  const countedOrders = useCounter(stats.totalOrders, 800);
+  const countedRevenue = useCounter(stats.totalRevenue, 1000);
+  const countedPendingOrders = useCounter(stats.pendingOrders, 800);
 
   // Auth check with session timeout
   useEffect(() => {
@@ -184,18 +184,35 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (user) {
       fetchAllData();
+      // Force a refresh after 2 seconds to catch any newly created orders from Vercel DB lag
+      const timeout = setTimeout(() => {
+        fetchDashboardStats();
+      }, 2000);
+      return () => clearTimeout(timeout);
     }
   }, [user, fetchAllData]);
 
-  // Auto-refresh every 10 seconds (to catch new orders quickly)
+  // Auto-refresh every 5 seconds for faster updates on Vercel (to catch new orders quickly)
   useEffect(() => {
     const interval = setInterval(() => {
       if (document.visibilityState === 'visible') {
         fetchDashboardStats(); // Just refresh stats, not all data
       }
-    }, 10000);
+    }, 5000);
 
-    return () => clearInterval(interval);
+    // Also refresh when user returns to the tab
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchDashboardStats();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [fetchDashboardStats]);
 
   const fetchProducts = async () => {
