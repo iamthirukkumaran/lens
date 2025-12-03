@@ -4,6 +4,9 @@ import Order from '@/models/Order';
 import Product from '@/models/Product';
 import User from '@/models/User';
 
+export const dynamic = 'force-dynamic'; // Force dynamic rendering on Vercel
+export const revalidate = 0; // Never cache this route
+
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
@@ -31,13 +34,20 @@ export async function GET(request: NextRequest) {
     // Get out of stock products count
     const outOfStockProducts = await Product.countDocuments({ stock: 0 });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       totalProducts,
       totalOrders,
       totalRevenue,
       pendingOrders,
       outOfStockProducts
     });
+
+    // Prevent caching
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+
+    return response;
   } catch (error) {
     console.error('Error fetching stats:', error);
     return NextResponse.json(

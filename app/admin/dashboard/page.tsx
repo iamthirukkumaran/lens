@@ -200,7 +200,10 @@ export default function AdminDashboard() {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch('/api/products?admin=true');
+      const timestamp = new Date().getTime();
+      const response = await fetch(`/api/products?admin=true&t=${timestamp}`, {
+        cache: 'no-store'
+      });
       if (!response.ok) throw new Error('Failed to fetch products');
       const data = await response.json();
       setProducts(data.data || []);
@@ -212,7 +215,10 @@ export default function AdminDashboard() {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch('/api/orders?admin=true');
+      const timestamp = new Date().getTime();
+      const response = await fetch(`/api/orders?admin=true&t=${timestamp}`, {
+        cache: 'no-store'
+      });
       if (!response.ok) throw new Error('Failed to fetch orders');
       const data = await response.json();
       setOrders(data.data || []);
@@ -225,7 +231,11 @@ export default function AdminDashboard() {
 
   const fetchDashboardStats = useCallback(async () => {
     try {
-      const response = await fetch('/api/admin/stats');
+      // Add timestamp to bust cache on every request
+      const timestamp = new Date().getTime();
+      const response = await fetch(`/api/admin/stats?t=${timestamp}`, {
+        cache: 'no-store' // Disable caching
+      });
       if (response.ok) {
         const data = await response.json();
         setStats(data);

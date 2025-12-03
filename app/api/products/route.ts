@@ -2,6 +2,9 @@ import { connectDB } from '@/lib/mongodb';
 import Product from '@/models/Product';
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic'; // Force dynamic rendering on Vercel
+export const revalidate = 0; // Never cache this route
+
 export async function GET(req: NextRequest) {
   try {
     await connectDB();
@@ -32,7 +35,7 @@ export async function GET(req: NextRequest) {
 
     const total = await Product.countDocuments(filter);
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       data: products,
       pagination: {
@@ -42,6 +45,13 @@ export async function GET(req: NextRequest) {
         pages: Math.ceil(total / limit),
       },
     });
+
+    // Prevent caching
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+
+    return response;
   } catch (error) {
     console.error('Error fetching products:', error);
     return NextResponse.json(

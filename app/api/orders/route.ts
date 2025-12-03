@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import Order from '@/models/Order';
 
+export const dynamic = 'force-dynamic'; // Force dynamic rendering on Vercel
+export const revalidate = 0; // Never cache this route
+
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
@@ -69,10 +72,17 @@ export async function GET(request: NextRequest) {
     if (adminQuery === 'true') {
       const orders = await Order.find({}).sort({ createdAt: -1 });
       
-      return NextResponse.json({
+      const response = NextResponse.json({
         success: true,
         data: orders,
       });
+
+      // Prevent caching
+      response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      response.headers.set('Pragma', 'no-cache');
+      response.headers.set('Expires', '0');
+
+      return response;
     }
 
     // If userId is provided, get user-specific orders
