@@ -160,60 +160,7 @@ export default function AdminDashboard() {
     checkAuth();
   }, [router]);
 
-  // Fetch all data
-  const fetchAllData = useCallback(async () => {
-    setRefreshing(true);
-    try {
-      await Promise.all([
-        fetchProducts(),
-        fetchOrders(),
-        fetchDashboardStats()
-      ]);
-      setLastUpdated(new Date()); // Update timestamp
-      setSuccess('Data refreshed successfully');
-      setTimeout(() => setSuccess(''), 3000);
-    } catch (err) {
-      setError('Failed to refresh data');
-    } finally {
-      setRefreshing(false);
-      setLoading(false);
-    }
-  }, []);
-
-  // Initial data load
-  useEffect(() => {
-    if (user) {
-      fetchAllData();
-      // Force a refresh after 2 seconds to catch any newly created orders from Vercel DB lag
-      const timeout = setTimeout(() => {
-        fetchDashboardStats();
-      }, 2000);
-      return () => clearTimeout(timeout);
-    }
-  }, [user, fetchAllData]);
-
-  // Auto-refresh every 5 seconds for faster updates on Vercel (to catch new orders quickly)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (document.visibilityState === 'visible') {
-        fetchDashboardStats(); // Just refresh stats, not all data
-      }
-    }, 5000);
-
-    // Also refresh when user returns to the tab
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        fetchDashboardStats();
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      clearInterval(interval);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [fetchDashboardStats]);
+  // ===== FETCH FUNCTIONS (must be before useEffects that use them) =====
 
   const fetchProducts = async () => {
     try {
@@ -262,6 +209,63 @@ export default function AdminDashboard() {
       console.error('Error fetching stats:', err);
     }
   }, []);
+
+  // ===== USE EFFECTS =====
+
+  // Fetch all data
+  const fetchAllData = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([
+        fetchProducts(),
+        fetchOrders(),
+        fetchDashboardStats()
+      ]);
+      setLastUpdated(new Date()); // Update timestamp
+      setSuccess('Data refreshed successfully');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError('Failed to refresh data');
+    } finally {
+      setRefreshing(false);
+      setLoading(false);
+    }
+  }, [fetchDashboardStats]);
+
+  // Initial data load
+  useEffect(() => {
+    if (user) {
+      fetchAllData();
+      // Force a refresh after 2 seconds to catch any newly created orders from Vercel DB lag
+      const timeout = setTimeout(() => {
+        fetchDashboardStats();
+      }, 2000);
+      return () => clearTimeout(timeout);
+    }
+  }, [user, fetchAllData]);
+
+  // Auto-refresh every 5 seconds for faster updates on Vercel (to catch new orders quickly)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        fetchDashboardStats(); // Just refresh stats, not all data
+      }
+    }, 5000);
+
+    // Also refresh when user returns to the tab
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchDashboardStats();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [fetchDashboardStats]);
 
   // Debounced search
   const debouncedSearch = useMemo(
