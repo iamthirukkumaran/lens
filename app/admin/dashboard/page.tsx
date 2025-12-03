@@ -110,6 +110,7 @@ export default function AdminDashboard() {
   const [dateFilter, setDateFilter] = useState<string>('all'); // 'today', 'week', 'month', 'all'
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'total'>('newest');
   const [refreshing, setRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   // Counting animation hooks
   const countedProducts = useCounter(stats.totalProducts, 1000);
@@ -168,6 +169,7 @@ export default function AdminDashboard() {
         fetchOrders(),
         fetchDashboardStats()
       ]);
+      setLastUpdated(new Date()); // Update timestamp
       setSuccess('Data refreshed successfully');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
@@ -185,16 +187,16 @@ export default function AdminDashboard() {
     }
   }, [user, fetchAllData]);
 
-  // Auto-refresh every 30 seconds
+  // Auto-refresh every 10 seconds (to catch new orders quickly)
   useEffect(() => {
     const interval = setInterval(() => {
       if (document.visibilityState === 'visible') {
-        fetchAllData();
+        fetchDashboardStats(); // Just refresh stats, not all data
       }
-    }, 30000);
+    }, 10000);
 
     return () => clearInterval(interval);
-  }, [fetchAllData]);
+  }, []);
 
   const fetchProducts = async () => {
     try {
@@ -227,6 +229,7 @@ export default function AdminDashboard() {
       if (response.ok) {
         const data = await response.json();
         setStats(data);
+        setLastUpdated(new Date()); // Update timestamp
       }
     } catch (err) {
       console.error('Error fetching stats:', err);
