@@ -27,6 +27,7 @@ export default function AddProductPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
 
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -79,6 +80,13 @@ export default function AddProductPage() {
           : value,
     }));
     setError('');
+    // Clear validation error for this field when user starts typing
+    if (validationErrors[name]) {
+      setValidationErrors((prev) => ({
+        ...prev,
+        [name]: '',
+      }));
+    }
   };
 
   const addColor = () => {
@@ -138,27 +146,47 @@ export default function AddProductPage() {
     setSuccess('');
     setSubmitting(true);
 
+    // Reset validation errors
+    setValidationErrors({});
+
     // Validation
-    if (!formData.name || !formData.brand) {
-      setError('Name and Brand are required');
-      setSubmitting(false);
-      return;
+    const errors: {[key: string]: string} = {};
+
+    if (!formData.name.trim()) {
+      errors.name = 'Product name is required';
     }
 
-    if (formData.price <= 0 || formData.mrp <= 0) {
-      setError('Price and MRP must be greater than 0');
-      setSubmitting(false);
-      return;
+    if (!formData.brand.trim()) {
+      errors.brand = 'Brand is required';
     }
 
-    if (formData.colors.length === 0 || formData.sizes.length === 0) {
-      setError('Please add at least one color and one size');
-      setSubmitting(false);
-      return;
+    if (formData.price <= 0) {
+      errors.price = 'Price must be greater than 0';
+    }
+
+    if (formData.mrp <= 0) {
+      errors.mrp = 'MRP must be greater than 0';
+    }
+
+    if (formData.colors.length === 0) {
+      errors.colors = 'Please add at least one color';
+    }
+
+    if (formData.sizes.length === 0) {
+      errors.sizes = 'Please add at least one size';
     }
 
     if (formData.images.length === 0) {
-      setError('Please add at least one image URL');
+      errors.images = 'Please add at least one image URL';
+    }
+
+    if (!formData.description.trim()) {
+      errors.description = 'Description is required';
+    }
+
+    // If there are validation errors, don't submit
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
       setSubmitting(false);
       return;
     }
@@ -271,9 +299,15 @@ export default function AddProductPage() {
                 value={formData.name}
                 onChange={handleInputChange}
                 placeholder="e.g., Classic Black Frame"
-                required
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-gray-900 focus:outline-none transition-colors"
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
+                  validationErrors.name
+                    ? 'border-red-500 focus:border-red-500'
+                    : 'border-gray-200 focus:border-gray-900'
+                }`}
               />
+              {validationErrors.name && (
+                <p className="mt-1 text-sm text-red-600">{validationErrors.name}</p>
+              )}
             </div>
 
             {/* Brand */}
@@ -285,8 +319,11 @@ export default function AddProductPage() {
                 name="brand"
                 value={formData.brand}
                 onChange={handleInputChange}
-                required
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-gray-900 focus:outline-none transition-colors"
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
+                  validationErrors.brand
+                    ? 'border-red-500 focus:border-red-500'
+                    : 'border-gray-200 focus:border-gray-900'
+                }`}
               >
                 <option value="">Select a brand</option>
                 <option value="Arcadio">Arcadio</option>
@@ -300,6 +337,9 @@ export default function AddProductPage() {
                 <option value="Gucci">Gucci</option>
                 <option value="Versace">Versace</option>
               </select>
+              {validationErrors.brand && (
+                <p className="mt-1 text-sm text-red-600">{validationErrors.brand}</p>
+              )}
             </div>
 
             {/* Price */}
@@ -313,11 +353,17 @@ export default function AddProductPage() {
                 value={formData.price}
                 onChange={handleInputChange}
                 placeholder="0"
-                required
                 min="0"
                 step="0.01"
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-gray-900 focus:outline-none transition-colors"
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
+                  validationErrors.price
+                    ? 'border-red-500 focus:border-red-500'
+                    : 'border-gray-200 focus:border-gray-900'
+                }`}
               />
+              {validationErrors.price && (
+                <p className="mt-1 text-sm text-red-600">{validationErrors.price}</p>
+              )}
             </div>
 
             {/* MRP */}
@@ -331,11 +377,17 @@ export default function AddProductPage() {
                 value={formData.mrp}
                 onChange={handleInputChange}
                 placeholder="0"
-                required
                 min="0"
                 step="0.01"
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-gray-900 focus:outline-none transition-colors"
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
+                  validationErrors.mrp
+                    ? 'border-red-500 focus:border-red-500'
+                    : 'border-gray-200 focus:border-gray-900'
+                }`}
               />
+              {validationErrors.mrp && (
+                <p className="mt-1 text-sm text-red-600">{validationErrors.mrp}</p>
+              )}
             </div>
 
             {/* Discount */}
@@ -398,7 +450,7 @@ export default function AddProductPage() {
             {/* Description - Full Width */}
             <div className="md:col-span-2">
               <label className="block text-sm font-semibold text-gray-900 mb-3">
-                Description
+                Description *
               </label>
               <textarea
                 name="description"
@@ -406,8 +458,15 @@ export default function AddProductPage() {
                 onChange={handleInputChange}
                 placeholder="Product description..."
                 rows={4}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-gray-900 focus:outline-none transition-colors"
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
+                  validationErrors.description
+                    ? 'border-red-500 focus:border-red-500'
+                    : 'border-gray-200 focus:border-gray-900'
+                }`}
               />
+              {validationErrors.description && (
+                <p className="mt-1 text-sm text-red-600">{validationErrors.description}</p>
+              )}
             </div>
 
             {/* Colors - Full Width */}
@@ -450,6 +509,9 @@ export default function AddProductPage() {
                   </div>
                 ))}
               </div>
+              {validationErrors.colors && (
+                <p className="mt-1 text-sm text-red-600">{validationErrors.colors}</p>
+              )}
             </div>
 
             {/* Sizes - Full Width */}
@@ -487,6 +549,9 @@ export default function AddProductPage() {
                   </label>
                 ))}
               </div>
+              {validationErrors.sizes && (
+                <p className="mt-1 text-sm text-red-600">{validationErrors.sizes}</p>
+              )}
             </div>
 
             {/* Images - Full Width */}
@@ -534,6 +599,9 @@ export default function AddProductPage() {
                   </div>
                 ))}
               </div>
+              {validationErrors.images && (
+                <p className="mt-1 text-sm text-red-600">{validationErrors.images}</p>
+              )}
             </div>
           </div>
 
