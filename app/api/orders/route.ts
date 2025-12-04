@@ -53,6 +53,30 @@ export async function POST(request: NextRequest) {
       status: 'pending',
     });
 
+    // Send confirmation email to customer
+    try {
+      const shippingEmail = shippingAddress?.email || userEmail;
+      if (shippingEmail) {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/send-email`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: shippingEmail,
+            subject: 'Order Confirmation - Hub of Frames',
+            orderStatus: 'confirmed',
+            orderDetails: {
+              orderId: order.orderId,
+              totalAmount: order.total,
+              items: order.items,
+            },
+            userName: order.userName,
+          }),
+        });
+      }
+    } catch (emailError) {
+      console.error('Error sending confirmation email:', emailError);
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Order created successfully',
