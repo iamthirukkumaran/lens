@@ -876,7 +876,7 @@ export default function Home() {
                         </div>
                         <div className="flex-1">
                           <div className="font-medium text-gray-900 mb-1">{item.name}</div>
-                          <div className="text-sm text-gray-500 mb-3">Rs. {item.price.toFixed(2)}</div>
+                          <div className="text-sm text-gray-500 mb-3">$ {item.price.toFixed(2)}</div>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <button 
@@ -925,7 +925,7 @@ export default function Home() {
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Subtotal</span>
-                    <span>Rs. {subtotal.toFixed(2)}</span>
+                    <span>$ {subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Shipping</span>
@@ -934,7 +934,7 @@ export default function Home() {
                   <div className="pt-4 border-t border-gray-100">
                     <div className="flex justify-between font-medium text-lg">
                       <span>Total</span>
-                      <span>Rs. {total.toFixed(2)}</span>
+                      <span>$ {total.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>

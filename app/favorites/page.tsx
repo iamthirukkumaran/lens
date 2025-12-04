@@ -328,14 +328,14 @@ export default function FavoritesPage() {
                       {/* Price */}
                       <div className="flex items-baseline gap-2 mb-4">
                         <span className="text-lg font-bold text-gray-900">
-                          Rs. {product.price.toFixed(2)}
+                          $ {product.price.toFixed(2)}
                         </span>
                         <span className="text-sm text-gray-400 line-through">
-                          Rs. {product.mrp.toFixed(2)}
+                          $ {product.mrp.toFixed(2)}
                         </span>
                         {product.discount > 0 && (
                           <span className="text-xs font-medium text-green-600">
-                            Save Rs. {(product.mrp - product.price).toFixed(2)}
+                            Save $ {(product.mrp - product.price).toFixed(2)}
                           </span>
                         )}
                       </div>
