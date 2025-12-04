@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import Order from '@/models/Order';
+import Product from '@/models/Product';
 
 export const dynamic = 'force-dynamic'; // Force dynamic rendering on Vercel
 export const revalidate = 0; // Never cache this route
@@ -21,6 +22,20 @@ export async function POST(request: NextRequest) {
 
     // Generate unique order ID
     const orderId = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+
+    // Reduce stock for each product in the order
+    for (const item of items) {
+      try {
+        await Product.findByIdAndUpdate(
+          item.productId,
+          { $inc: { stock: -item.quantity } },
+          { new: true }
+        );
+      } catch (err) {
+        console.error(`Failed to update stock for product ${item.productId}:`, err);
+        // Don't fail the order if stock update fails, just log it
+      }
+    }
 
     const order = await Order.create({
       userId,

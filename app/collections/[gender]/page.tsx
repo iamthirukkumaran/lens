@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import FiltersSidebar from '@/components/FiltersSidebar';
 import ProductCard from '@/components/ProductCard';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 
 interface Product {
   _id: string;
@@ -31,7 +31,8 @@ export default function CollectionsPage({ params }: CollectionsPageProps) {
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filterLoading, setFilterLoading] = useState(false); // Separate loading state for filters
+  const [filterLoading, setFilterLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [filters, setFilters] = useState<any>({});
   const [pagination, setPagination] = useState({ page: 1, total: 0, pages: 0 });
   const [favorites, setFavorites] = useState<string[]>([]);
@@ -114,6 +115,13 @@ export default function CollectionsPage({ params }: CollectionsPageProps) {
   // Initial fetch
   useEffect(() => {
     fetchProducts(currentPage, filters);
+
+    // Set up auto-refresh every 60 seconds to show updated stock
+    const refreshInterval = setInterval(() => {
+      fetchProducts(currentPage, filters);
+    }, 60000); // Refresh every 60 seconds (1 minute)
+
+    return () => clearInterval(refreshInterval);
   }, []);
 
   // Fetch when page changes
@@ -178,8 +186,21 @@ export default function CollectionsPage({ params }: CollectionsPageProps) {
               <ChevronLeft size={20} />
               <span className="text-sm font-medium">Back to Home</span>
             </button>
-            <div className="text-xs text-gray-400 cursor-default">
-              GENDER: <span className="font-semibold text-gray-700 uppercase">{genderLabel}</span>
+            <div className="flex items-center gap-4">
+              <div className="text-xs text-gray-400 cursor-default">
+                GENDER: <span className="font-semibold text-gray-700 uppercase">{genderLabel}</span>
+              </div>
+              <button
+                onClick={() => {
+                  setRefreshing(true);
+                  fetchProducts(currentPage, filters).then(() => setRefreshing(false));
+                }}
+                disabled={refreshing}
+                className="p-2 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
+                title="Refresh product list to see updated stock"
+              >
+                <RefreshCw size={18} className={`text-gray-600 ${refreshing ? 'animate-spin' : ''}`} />
+              </button>
             </div>
           </div>
 

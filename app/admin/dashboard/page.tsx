@@ -745,6 +745,14 @@ export default function AdminDashboard() {
                   <BarChart3 size={32} className="text-gray-600 mb-2" />
                   <span className="text-sm font-medium text-gray-600">Analytics</span>
                 </Link>
+
+                <Link
+                  href="/admin/inventory"
+                  className="flex flex-col items-center justify-center p-6 border-2 border-gray-200 rounded-xl hover:border-gray-300 hover:bg-gray-50 transition-colors group"
+                >
+                  <Package size={32} className="text-gray-600 mb-2" />
+                  <span className="text-sm font-medium text-gray-600">Inventory</span>
+                </Link>
               </div>
             </div>
 
