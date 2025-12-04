@@ -13,6 +13,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
 
   useEffect(() => {
     // Check if user is already logged in
@@ -40,6 +41,29 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
     setSuccess('');
+
+    // Reset validation errors
+    setValidationErrors({});
+
+    // Validation
+    const errors: {[key: string]: string} = {};
+
+    if (!formData.email.trim()) {
+      errors.email = 'Email address is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = 'Please enter a valid email address';
+    }
+
+    if (!formData.password.trim()) {
+      errors.password = 'Password is required';
+    }
+
+    // If there are validation errors, don't submit
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await fetch('/api/auth/login', {
@@ -85,6 +109,14 @@ export default function LoginPage() {
       ...prev,
       [name]: value
     }));
+    setError('');
+    // Clear validation error for this field when user starts typing
+    if (validationErrors[name]) {
+      setValidationErrors((prev) => ({
+        ...prev,
+        [name]: '',
+      }));
+    }
   };
 
   return (
@@ -142,10 +174,16 @@ export default function LoginPage() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="you@example.com"
-                  required
-                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-gray-900 focus:outline-none transition-colors"
+                  className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
+                    validationErrors.email
+                      ? 'border-red-500 focus:border-red-500'
+                      : 'border-gray-200 focus:border-gray-900'
+                  }`}
                 />
               </div>
+              {validationErrors.email && (
+                <p className="mt-1 text-sm text-red-600">{validationErrors.email}</p>
+              )}
             </div>
 
             {/* Password Field */}
@@ -164,10 +202,16 @@ export default function LoginPage() {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Enter your password"
-                  required
-                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-gray-900 focus:outline-none transition-colors"
+                  className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
+                    validationErrors.password
+                      ? 'border-red-500 focus:border-red-500'
+                      : 'border-gray-200 focus:border-gray-900'
+                  }`}
                 />
               </div>
+              {validationErrors.password && (
+                <p className="mt-1 text-sm text-red-600">{validationErrors.password}</p>
+              )}
             </div>
 
             {/* Submit Button */}
@@ -199,16 +243,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Demo Credentials */}
-        <div className="mt-8 p-4 rounded-xl bg-blue-50 border border-blue-200">
-          <p className="text-xs font-semibold text-blue-900 mb-2">Demo Credentials:</p>
-          <p className="text-xs text-blue-800">
-            <strong>Admin:</strong> admin@hubofframes.com / password123
-          </p>
-          <p className="text-xs text-blue-800">
-            <strong>Customer:</strong> customer@hubofframes.com / password123
-          </p>
-        </div>
+       
       </div>
     </div>
   );
