@@ -494,7 +494,7 @@ export default function AdminDashboard() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          to: order.userEmail,
+          to: order.shippingAddress?.email || order.userEmail,
           ...statusMessages[status],
           orderDetails: {
             orderId: order.orderId,
@@ -502,7 +502,7 @@ export default function AdminDashboard() {
             items: order.items,
             trackingNumber: status === 'shipped' ? `TRACK-${order.orderId}` : undefined
           },
-          userName: order.userName
+          userName: order.shippingAddress?.fullName || order.userName
         }),
       });
 
