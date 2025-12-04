@@ -116,18 +116,36 @@ export async function PUT(request: NextRequest) {
     await connectDB();
 
     const body = await request.json();
-    const { orderId, status } = body;
+    const { orderId, status, shippingAddress } = body;
 
-    if (!orderId || !status) {
+    if (!orderId) {
       return NextResponse.json(
-        { success: false, error: 'orderId and status are required' },
+        { success: false, error: 'orderId is required' },
+        { status: 400 }
+      );
+    }
+
+    // Build update object with only provided fields
+    const updateData: any = {};
+    
+    if (status) {
+      updateData.status = status;
+    }
+    
+    if (shippingAddress) {
+      updateData.shippingAddress = shippingAddress;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json(
+        { success: false, error: 'No valid fields to update' },
         { status: 400 }
       );
     }
 
     const order = await Order.findByIdAndUpdate(
       orderId,
-      { status },
+      updateData,
       { new: true }
     );
 
@@ -140,7 +158,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Order status updated successfully',
+      message: 'Order updated successfully',
       order,
     });
   } catch (error) {

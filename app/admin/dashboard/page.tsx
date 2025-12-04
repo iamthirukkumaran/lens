@@ -1208,9 +1208,10 @@ export default function AdminDashboard() {
                                   </div>
                                   <div className="flex items-center gap-2">
                                     <Mail size={14} className="text-gray-400" />
-                                    <p className="text-gray-600">{order.userEmail}</p>
+                                    <p className="text-gray-600">{order.shippingAddress.email || order.userEmail}</p>
                                   </div>
                                 </div>
+                                <p className="text-xs text-gray-500 mt-2">💡 Email notifications will be sent to: <strong>{order.shippingAddress.email || order.userEmail}</strong></p>
                               </div>
 
                               {/* Status Update */}
