@@ -433,7 +433,7 @@ export default function Home() {
             {[
               { img: '/top1.jpeg', title: 'Crystal Frame Collection', tag: 'NEW', gradient: 'from-blue-500/20 to-cyan-500/20' },
               { img: '/top2.jpeg', title: 'Shadow Line Frames', tag: 'LIMITED', gradient: 'from-purple-500/20 to-pink-500/20' },
-              { img: '/top3.jpg', title: 'Artisanal Wood Collection', tag: 'VINTAGE', gradient: 'from-amber-500/20 to-orange-500/20' }
+              { img: '/s5.jpg', title: 'Artisanal Wood Collection', tag: 'VINTAGE', gradient: 'from-amber-500/20 to-orange-500/20' }
             ].map((item, index) => (
               <div
                 key={index}
