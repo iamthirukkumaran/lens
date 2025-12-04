@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
                 <h4>Items:</h4>
                 ${orderDetails.items.map((item: any) => `
                   <div class="item">
-                    <span>${item.name} x ${item.quantity}</span>
+                    <span>${item.name} x-- ${item.quantity}</span>
                     <span>$${(item.price * item.quantity).toFixed(2)}</span>
                   </div>
                 `).join('')}

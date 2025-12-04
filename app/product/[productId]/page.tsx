@@ -6,6 +6,8 @@ import { Heart, ShoppingBag, Zap, Shield, Truck, RefreshCw, CreditCard } from 'l
 import ProductGallery from '@/components/ProductGallery';
 import Image from 'next/image';
 import { Toast } from '@/components/Toast';
+import RatingForm from '@/components/RatingForm';
+import RatingsDisplay from '@/components/RatingsDisplay';
 
 interface Product {
   _id: string;
@@ -36,6 +38,7 @@ export default function ProductDetailsPage() {
   const [isFavorited, setIsFavorited] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [ratingsRefresh, setRatingsRefresh] = useState(0);
 
   // First effect: Set productId from params
   useEffect(() => {
@@ -546,6 +549,22 @@ export default function ProductDetailsPage() {
                   </li>
                 </ul>
               </div>
+
+              {/* Ratings Display */}
+              {productId && (
+                <RatingsDisplay 
+                  productId={productId} 
+                  refreshTrigger={ratingsRefresh}
+                />
+              )}
+
+              {/* Rating Form */}
+              {productId && (
+                <RatingForm 
+                  productId={productId}
+                  onRatingSubmitted={() => setRatingsRefresh(prev => prev + 1)}
+                />
+              )}
             </div>
           </div>
         </div>
