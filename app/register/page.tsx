@@ -19,6 +19,8 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
+  const [showPassword, setShowPassword] = useState(false);
+
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -192,32 +194,75 @@ export default function RegisterPage() {
             </div>
 
             {/* Password Field */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-3">
-                Password
-              </label>
-              <div className="relative">
-                <Lock
-                  size={18}
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-                />
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="At least 6 characters"
-                  className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
-                    validationErrors.password
-                      ? 'border-red-500 focus:border-red-500'
-                      : 'border-gray-200 focus:border-gray-900'
-                  }`}
-                />
-              </div>
-              {validationErrors.password && (
-                <p className="mt-1 text-sm text-red-600">{validationErrors.password}</p>
-              )}
-            </div>
+           <div>
+  <label className="block text-sm font-semibold text-gray-900 mb-3">
+    Password
+  </label>
+
+  <div className="relative">
+    <Lock
+      size={18}
+      className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
+    />
+
+    <input
+      type={showPassword ? "text" : "password"}
+      name="password"
+      value={formData.password}
+      onChange={handleChange}
+      placeholder="Enter your password"
+      className={`w-full pl-12 pr-12 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
+        validationErrors.password
+          ? "border-red-500 focus:border-red-500"
+          : "border-gray-200 focus:border-gray-900"
+      }`}
+    />
+
+    {/* Eye Icon */}
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
+    >
+      {showPassword ? (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={1.5}
+            d="M3 3l18 18M10.584 10.587A2 2 0 0113.415 13.42M15.536 15.538A5.5 5.5 0 018.463 8.462M6.17 6.17C3.76 7.94 2 10 2 10s3 6 10 6c1.72 0 3.315-.36 4.743-.986"
+          />
+        </svg>
+      ) : (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={1.5}
+            d="M2.458 12C3.732 7.943 7.522 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.478 0-8.268-2.943-9.542-7z"
+          />
+          <circle cx="12" cy="12" r="3" strokeWidth={1.5} />
+        </svg>
+      )}
+    </button>
+  </div>
+
+  {validationErrors.password && (
+    <p className="mt-1 text-sm text-red-600">{validationErrors.password}</p>
+  )}
+</div>
 
             {/* Confirm Password Field */}
             <div>

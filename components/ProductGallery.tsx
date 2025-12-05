@@ -14,13 +14,14 @@ export default function ProductGallery({ images, modelNumber }: ProductGalleryPr
   return (
     <div className="space-y-6">
       {/* Main Image */}
-      <div className="relative aspect-square overflow-hidden rounded-3xl bg-gray-100">
+      <div className="relative aspect-square overflow-hidden rounded-3xl bg-gray-100 flex items-center justify-center">
         {images[selectedImage] && (
           <Image
             src={images[selectedImage]}
             alt={modelNumber}
-            fill
-            className="object-cover"
+            width={400}
+            height={400}
+            className="w-full h-full object-contain"
           />
         )}
       </div>
@@ -41,8 +42,9 @@ export default function ProductGallery({ images, modelNumber }: ProductGalleryPr
               <Image
                 src={image}
                 alt={`${modelNumber} view ${index + 1}`}
-                fill
-                className="object-cover"
+                width={100}
+                height={100}
+                className="w-full h-full object-contain"
               />
             </button>
           ))}

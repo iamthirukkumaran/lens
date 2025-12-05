@@ -92,8 +92,9 @@ export default function ProductCard({
             <Image
               src={images[0]}
               alt={modelNumber}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              width={192}
+              height={192}
+              className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
             />
           )}
 

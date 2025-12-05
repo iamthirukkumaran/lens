@@ -17,6 +17,8 @@ export default function Home() {
   const [favorites, setFavorites] = useState<string[]>([])
   const [activeCategory, setActiveCategory] = useState('Gallery')
   const [isVisible, setIsVisible] = useState(false)
+  const [featuredProducts, setFeaturedProducts] = useState<any[]>([])
+  const [loadingProducts, setLoadingProducts] = useState(true)
 
   useEffect(() => {
     setIsVisible(true)
@@ -83,6 +85,27 @@ export default function Home() {
       loadFavorites()
     }
   }, [isCartOpen])
+
+  // Fetch featured products
+  useEffect(() => {
+    const fetchFeaturedProducts = async () => {
+      try {
+        setLoadingProducts(true)
+        const response = await fetch('/api/products?limit=4')
+        const data = await response.json()
+        if (data.success && data.data) {
+          setFeaturedProducts(data.data || [])
+        }
+      } catch (error) {
+        console.error('Error fetching products:', error)
+        setFeaturedProducts([])
+      } finally {
+        setLoadingProducts(false)
+      }
+    }
+
+    fetchFeaturedProducts()
+  }, [])
 
   const handleLogout = () => {
     localStorage.removeItem('user')
@@ -203,227 +226,9 @@ export default function Home() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50/10 to-white overflow-x-hidden">
-      {/* Enhanced Navigation with Parallax */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-700 ${
-        isScrolled 
-          ? 'bg-white/90 backdrop-blur-xl border-b border-gray-100/50 shadow-lg' 
-          : 'bg-transparent'
-      }`}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4 lg:py-5">
-          <div className="flex items-center justify-between">
-            {/* Logo with Animation */}
-            <Link href="/" className="relative group">
-              <Image 
-                src="/logo.svg" 
-                alt="Hub of Frames Logo" 
-                width={120} 
-                height={40}
-                className="w-40 h-14 transition-all duration-500 group-hover:scale-105"
-              />
-              <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 group-hover:w-full transition-all duration-500"></div>
-            </Link>
-
-            {/* Actions with Hover Effects */}
-            <div className="flex items-center gap-2 lg:gap-4">
-              <Link href="/search" className="p-2 hover:bg-gray-100/50 rounded-full transition-all duration-300 group relative">
-                <Search size={20} className="text-gray-600 group-hover:text-blue-600 transition-colors" />
-                <div className="absolute inset-0 rounded-full border border-transparent group-hover:border-blue-100 transition-all duration-300"></div>
-              </Link>
-              
-              <Link href="/favorites" className="p-2 hover:bg-gray-100/50 rounded-full transition-all duration-300 group relative">
-                <Heart size={20} className="text-gray-600 group-hover:text-red-500 transition-colors" />
-                {favorites.length > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse font-bold">
-                    {favorites.length > 9 ? '9+' : favorites.length}
-                  </span>
-                )}
-              </Link>
-              
-              {user ? (
-                <button 
-                  onClick={() => setIsCartOpen(true)}
-                  className="p-2 hover:bg-gray-100/50 rounded-full transition-all duration-300 group relative"
-                >
-                  <ShoppingBag size={20} className="text-gray-600 group-hover:text-gray-900 transition-colors" />
-                  {cartItems.length > 0 && (
-                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-gray-900 to-gray-700 text-white text-xs rounded-full flex items-center justify-center animate-bounce font-bold">
-                      {cartItems.length > 9 ? '9+' : cartItems.length}
-                    </span>
-                  )}
-                </button>
-              ) : null}
-
-              {/* Auth Buttons - Desktop */}
-              {!user && (
-                <div className="hidden sm:flex items-center gap-3 ml-2 lg:ml-4">
-                  <Link 
-                    href="/login" 
-                    className="px-4 py-2 text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition-all duration-300"
-                  >
-                    Sign In
-                  </Link>
-                  <Link 
-                    href="/register" 
-                    className="px-5 py-2 bg-gradient-to-r from-gray-900 to-gray-800 text-white font-medium rounded-lg hover:shadow-lg hover:shadow-gray-900/20 transition-all duration-300 transform hover:scale-105"
-                  >
-                    Sign Up
-                  </Link>
-                </div>
-              )}
-              
-              <button 
-                onClick={() => setIsMenuOpen(true)}
-                className="p-2 hover:bg-gray-100/50 rounded-full transition-all duration-300 group relative ml-2"
-              >
-                <Menu size={24} className="text-gray-600 group-hover:text-gray-900 transition-colors" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Enhanced Menu with Animations */}
-      {isMenuOpen && (
-        <div className="fixed inset-0 z-50">
-          {/* Animated Backdrop */}
-          <div 
-            className="absolute inset-0 bg-gradient-to-br from-black/20 via-black/10 to-white/5 backdrop-blur-xl transition-all duration-500"
-            onClick={() => setIsMenuOpen(false)}
-          />
-          
-          {/* Menu Panel with Slide-in Animation */}
-          <div className="absolute inset-y-0 right-0 w-full max-w-md bg-gradient-to-b from-white via-gray-50/95 to-white shadow-2xl transform transition-all duration-500 ease-out">
-            <div className="h-full flex flex-col overflow-y-auto">
-              {/* Header */}
-              <div className="p-6 lg:p-8 border-b border-gray-100/50">
-                <div className="flex items-center justify-between">
-                  <Link href="/" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-3 group">
-                    <Image src="/logo.svg" alt="Logo" width={40} height={40} className="w-10 h-10 transition-transform group-hover:scale-110" />
-                    <span className="text-xl font-light tracking-tight">Hub of <span className="font-semibold">Frames</span></span>
-                  </Link>
-                  <button 
-                    onClick={() => setIsMenuOpen(false)}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-all duration-300"
-                  >
-                    <CloseIcon size={24} className="text-gray-400 hover:text-gray-600" />
-                  </button>
-                </div>
-              </div>
-
-              {/* User Info */}
-              <div className="p-6 lg:p-8">
-                {user ? (
-                  <div className="mb-6 p-4 rounded-xl bg-gradient-to-br from-gray-50 to-white border border-gray-100/50 shadow-sm">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold">
-                        {user.name.charAt(0)}
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-semibold text-gray-900">{user.name}</p>
-                        <p className="text-xs text-gray-600 truncate">{user.email}</p>
-                        <div className="mt-1">
-                          <span className="px-2 py-1 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-600 text-xs rounded-full">
-                            {user.role === 'admin' ? 'Admin' : 'Customer'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="mb-6 grid grid-cols-2 gap-3">
-                    <Link href="/login" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 bg-gradient-to-r from-gray-900 to-gray-800 text-white rounded-lg hover:shadow-lg transition-all duration-300 text-center font-medium">
-                      Login
-                    </Link>
-                    <Link href="/register" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 border-2 border-gray-900 text-gray-900 rounded-lg hover:bg-gray-900 hover:text-white transition-all duration-300 text-center font-medium">
-                      Register
-                    </Link>
-                  </div>
-                )}
-
-               
-
-                {/* Main Menu Items */}
-                <div className="space-y-2 mb-8">
-                  <Link href="/collections/men" onClick={() => setIsMenuOpen(false)} className="group flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-all duration-300">
-                    <div className="flex items-center gap-3">
-                     
-                      <span className="font-medium">Men's Collection</span>
-                    </div>
-                    <ChevronRight size={16} className="text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
-                  </Link>
-                  
-                  <Link href="/collections/women" onClick={() => setIsMenuOpen(false)} className="group flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-all duration-300">
-                    <div className="flex items-center gap-3">
-                     
-                      <span className="font-medium">Women's Collection</span>
-                    </div>
-                    <ChevronRight size={16} className="text-gray-400 group-hover:text-rose-600 group-hover:translate-x-1 transition-all" />
-                  </Link>
-                  
-                  <Link href="/collections/kids" onClick={() => setIsMenuOpen(false)} className="group flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-all duration-300">
-                    <div className="flex items-center gap-3">
-                      
-                      <span className="font-medium">Kids Collection</span>
-                    </div>
-                    <ChevronRight size={16} className="text-gray-400 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all" />
-                  </Link>
-                </div>
-
-                {/* Account Links */}
-                {user && (
-                  <div className="mb-8">
-                    <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-4">My Account</h3>
-                    <div className="space-y-2">
-                      <Link href="/favorites" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-all duration-300">
-                        <Heart size={18} className="text-red-400" />
-                        <span>My Favorites</span>
-                      </Link>
-                      <Link href="/orders" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-all duration-300">
-                        <Truck size={18} className="text-blue-400" />
-                        <span>My Orders</span>
-                      </Link>
-                      <Link href="/profile" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-all duration-300">
-                        <User size={18} className="text-purple-400" />
-                        <span>Profile Settings</span>
-                      </Link>
-                    </div>
-                  </div>
-                )}
-
-                {/* Admin Panel */}
-                {user?.role === 'admin' && (
-                  <div className="mb-8">
-                    <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-4">Admin Panel</h3>
-                    <div className="space-y-2">
-                      <Link href="/admin/dashboard" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-all duration-300">
-                        <LayoutDashboard size={18} className="text-red-400" />
-                        <span>Admin Dashboard</span>
-                      </Link>
-                      
-                      
-                    </div>
-                  </div>
-                )}
-
-                {/* Logout Button */}
-                {user && (
-                  <button
-                    onClick={handleLogout}
-                    className="w-full mt-4 p-3 bg-gradient-to-r from-red-50 to-red-100 text-red-600 rounded-lg hover:from-red-100 hover:to-red-200 transition-all duration-300 font-medium flex items-center justify-center gap-2"
-                  >
-                    <LogOut size={18} />
-                    Logout
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
+    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50/10 to-white overflow-x-hidden pt-20 lg:pt-24">
       {/* Enhanced Gallery Section */}
-      <section className="py-24 lg:py-32 px-6 lg:px-8 mt-13 lg:mt-13">
+      <section className="py-10 lg:py-1 px-6 lg:px-8 mt-13 lg:mt-13">
         <div className="max-w-7xl mx-auto">
           {/* Header with Animation */}
          
@@ -453,7 +258,7 @@ export default function Home() {
                   
                   {/* Top Tag */}
                   <div className="absolute top-6 left-6 z-20 transform -translate-x-10 group-hover:translate-x-0 transition-transform duration-500 delay-200">
-                    <span className="px-3 py-1 bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-medium tracking-wider rounded-full border border-white/30">
+                    <span className="px-5 py-1 bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-medium tracking-wider rounded-full border border-white/30">
                       {item.tag}
                     </span>
                   </div>
@@ -615,8 +420,144 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Featured Products Section */}
+      <section className="py-20 lg:py-3 px-6 lg:px-6">
+        <div className="max-w-7xl mx-auto">
+          {/* Section Header */}
+          <div className="text-center mb-16 lg:mb-24">
+            <div className="inline-flex items-center gap-4 mb-6">
+              <div className="w-12 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500"></div>
+              <span className="text-sm tracking-[0.3em] text-gray-600 font-medium">NEW ARRIVALS</span>
+              <div className="w-12 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500"></div>
+            </div>
+            <h2 className="text-4xl lg:text-6xl font-light tracking-tight mb-8">
+              <span className="block text-gray-900">Featured</span>
+              <span className="text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text">
+                Products
+              </span>
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              Discover our handpicked selection of premium eyewear
+            </p>
+          </div>
+
+          {/* Products Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+            {loadingProducts ? (
+              // Loading skeleton
+              [...Array(4)].map((_, i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="aspect-square bg-gray-200 rounded-2xl mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                </div>
+              ))
+            ) : featuredProducts.length > 0 ? (
+              featuredProducts.map((product) => (
+                <Link
+                  key={product._id}
+                  href={`/product/${product._id}`}
+                  className="group"
+                >
+                  <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-500">
+                    {/* Image Container */}
+                    <div className="relative aspect-square overflow-hidden bg-gray-100 flex items-center justify-center">
+                      {product.images && product.images.length > 0 ? (
+                        <Image
+                          src={product.images[0]}
+                          alt={product.name}
+                          width={300}
+                          height={300}
+                          className="w-full h-full object-contain transform group-hover:scale-110 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                          <ShoppingBag size={32} className="text-gray-400" />
+                        </div>
+                      )}
+
+                      {/* Tag Badge */}
+                      <div className="absolute top-4 right-4 z-10">
+                        <span className="px-3 py-1 bg-white/95 backdrop-blur-sm text-gray-900 text-xs font-semibold rounded-full">
+                          New
+                        </span>
+                      </div>
+
+                      {/* Wishlist Button */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          // Add to favorites logic
+                        }}
+                        className="absolute top-4 left-4 z-10 w-10 h-10 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all duration-300 group-hover:scale-110"
+                      >
+                        <Heart size={18} className={favorites.includes(product._id) ? 'fill-red-500 text-red-500' : 'text-gray-700'} />
+                      </button>
+                    </div>
+
+                    {/* Product Info */}
+                    <div className="p-4 lg:p-6">
+                      <h3 className="text-base lg:text-lg font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition">
+                        {product.name}
+                      </h3>
+
+                      {/* Rating */}
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="flex items-center gap-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              size={14}
+                              className={i < 4 ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-xs text-gray-600">(12)</span>
+                      </div>
+
+                      {/* Price and Button */}
+                      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                        <span className="text-lg lg:text-xl font-bold text-gray-900">
+                          ${product.price?.toFixed(2) || '0.00'}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            // Add to cart logic
+                          }}
+                          className="p-2 rounded-lg bg-gray-900 text-white hover:bg-black transition-all duration-300 group-hover:scale-110"
+                        >
+                          <ShoppingBag size={18} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <p className="text-gray-600">No products available</p>
+              </div>
+            )}
+          </div>
+
+          {/* View All Button */}
+          <div className="mt-16 lg:mt-20 text-center">
+            <Link
+              href="/collections/men"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-gray-900 to-gray-800 text-white font-medium rounded-lg hover:shadow-lg hover:shadow-gray-900/20 transition-all duration-300 transform hover:scale-105"
+            >
+              View Products
+              <ArrowRight size={20} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Enhanced Features Section */}
-      <section className="py-2 lg:py-2 px-6 lg:px-8">
+      <section className="py-2 lg:py-19 px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16 lg:mb-24">
             <div className="inline-flex items-center gap-4 mb-6">
@@ -632,29 +573,43 @@ export default function Home() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <div 
-                key={index} 
-                className="group relative p-8 rounded-2xl bg-gradient-to-br from-white to-gray-50 border border-gray-100 hover:border-gray-200 transition-all duration-500 hover:-translate-y-2 hover:shadow-xl"
-              >
-                {/* Icon with Background */}
-                <div className="mb-6 relative">
-                  <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                    <div className="text-3xl text-gray-700">
-                      {feature.icon}
-                    </div>
-                  </div>
-                </div>
-                
-                <h3 className="text-xl font-medium mb-3 text-gray-900">{feature.title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
-                
-                {/* Hover Line */}
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-              </div>
-            ))}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+  {features.map((feature, index) => (
+    <div 
+      key={index} 
+      className="group relative p-8 rounded-2xl bg-gradient-to-br from-white to-gray-50 border border-gray-100 hover:border-gray-200 transition-all duration-500 hover:-translate-y-2 hover:shadow-xl overflow-hidden"
+    >
+      {/* Animated Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-transparent group-hover:via-blue-50/30 group-hover:to-purple-50/20 transition-all duration-700"></div>
+      
+      {/* Icon with Background */}
+      <div className="mb-6 relative z-10">
+        <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-500 shadow-sm">
+          <div className="text-3xl text-gray-700">
+            {feature.icon}
           </div>
+        </div>
+      </div>
+      
+      <div className="relative z-10">
+        <h3 className="text-xl font-medium mb-3 text-gray-900">{feature.title}</h3>
+        <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
+      </div>
+      
+      {/* Enhanced Hover Line with Animation */}
+      <div className="absolute bottom-0 left-0 right-0 h-0.5 overflow-hidden">
+        {/* Base line */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500 to-purple-500 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
+        {/* Glow effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-400/30 via-purple-400/40 to-pink-400/30 blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+      </div>
+      
+      {/* Corner Accents */}
+      <div className="absolute top-0 left-0 w-2 h-2 bg-gradient-to-br from-blue-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      <div className="absolute top-0 right-0 w-2 h-2 bg-gradient-to-br from-blue-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-150"></div>
+    </div>
+  ))}
+</div>
         </div>
       </section>
 
@@ -741,238 +696,7 @@ export default function Home() {
       </section>
        <Newsletter />
 
-            <footer className="py-12 lg:py-13 px-6 lg:px-8 border-t border-gray-100 bg-gradient-to-r from-gray-900 to-black text-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-12">
-            <div>
-              <Link href="/" className="inline-block mb-4">
-                <Image 
-                  src="/logo.svg" 
-                  alt="Logo" 
-                  width={120} 
-                  height={40}
-                  className="w-32 h-11"
-                />
-              </Link>
-              <p className="text-gray-300 text-sm leading-relaxed mb-6">
-                Redefining the relationship between art and space since 1998.
-              </p>
-              <div className="flex items-center gap-4">
-                <Link href="#" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
-                  <span className="text-xs font-medium text-white">Fb</span>
-                </Link>
-                <Link href="#" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
-                  <span className="text-xs font-medium text-white">Ig</span>
-                </Link>
-                <Link href="#" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
-                  <span className="text-xs font-medium text-white">In</span>
-                </Link>
-              </div>
-            </div>
-            
-            <div>
-              <h3 className="font-medium text-white mb-4">Collections</h3>
-              <ul className="space-y-3">
-                {['Gallery Series', 'Modern Frames', 'Vintage Collection', 'Minimalist', 'Custom Orders'].map((item) => (
-                  <li key={item}>
-                    <Link href="#" className="text-sm text-gray-300 hover:text-white transition-colors">
-                      {item}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-medium text-white mb-4">Company</h3>
-              <ul className="space-y-3">
-                {['About Us', 'Our Story', 'Studio Locations', 'Careers', 'Press'].map((item) => (
-                  <li key={item}>
-                    <Link href="#" className="text-sm text-gray-300 hover:text-white transition-colors">
-                      {item}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-medium text-white mb-4">Support</h3>
-              <ul className="space-y-3">
-                {['Contact Us', 'Shipping & Returns', 'FAQ', 'Size Guide', 'Order Tracking'].map((item) => (
-                  <li key={item}>
-                    <Link href="#" className="text-sm text-gray-300 hover:text-white transition-colors">
-                      {item}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-          
-          <div className="pt-8 border-t border-gray-700">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="text-sm text-gray-400">
-                © 2024 Hub of Frames. All rights reserved.
-              </div>
-              <div className="flex items-center gap-6">
-                {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((item) => (
-                  <Link key={item} href="#" className="text-sm text-gray-400 hover:text-white transition-colors">
-                    {item}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
-
-      {/* Enhanced Cart Modal */}
-      {isCartOpen && (
-        <div className="fixed inset-0 z-50">
-          {/* Backdrop with Animation */}
-          <div 
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300"
-            onClick={() => setIsCartOpen(false)}
-          />
-          
-          {/* Cart Panel with Slide-in */}
-          <div className="absolute inset-y-0 right-0 w-full max-w-md bg-white animate-in slide-in-from-right duration-500 ease-out">
-            <div className="h-full flex flex-col">
-              {/* Header */}
-              <div className="p-6 border-b border-gray-100">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <ShoppingBag size={24} className="text-gray-700" />
-                    <div className="text-xl font-medium">Your Bag</div>
-                  </div>
-                  <button 
-                    onClick={() => setIsCartOpen(false)}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                  >
-                    <X size={20} />
-                  </button>
-                </div>
-              </div>
-
-              {/* Items */}
-              <div className="flex-1 overflow-y-auto p-6">
-                {cartItems.length > 0 ? (
-                  <div className="space-y-4">
-                    {cartItems.map((item) => (
-                      <div key={item._id} className="group flex items-center gap-4 p-4 rounded-xl border border-gray-100 hover:border-gray-200 transition-colors">
-                        <div className="w-20 h-20 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden">
-                          {item.image ? (
-                            <Image
-                              src={item.image}
-                              alt={item.name}
-                              width={80}
-                              height={80}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200"></div>
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <div className="font-medium text-gray-900 mb-1">{item.name}</div>
-                          <div className="text-sm text-gray-500 mb-3">$ {item.price.toFixed(2)}</div>
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <button 
-                                onClick={() => handleDecreaseQuantity(item._id)}
-                                className="w-8 h-8 rounded-full border border-gray-200 hover:border-gray-300 flex items-center justify-center transition-colors"
-                              >
-                                <Minus size={12} />
-                              </button>
-                              <span className="text-sm font-medium">{item.quantity}</span>
-                              <button 
-                                onClick={() => handleIncreaseQuantity(item._id)}
-                                className="w-8 h-8 rounded-full border border-gray-200 hover:border-gray-300 flex items-center justify-center transition-colors"
-                              >
-                                <Plus size={12} />
-                              </button>
-                            </div>
-                            <button 
-                              onClick={() => handleRemoveFromCart(item._id)}
-                              className="text-sm text-red-500 hover:text-red-600 transition-colors"
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="h-full flex flex-col items-center justify-center text-center p-8">
-                    <ShoppingBag size={64} className="text-gray-300 mb-4" />
-                    <div className="text-gray-500 mb-2">Your bag is empty</div>
-                    <p className="text-sm text-gray-400 mb-6">Add items to get started</p>
-                    <Link 
-                      href="/collections/men"
-                      onClick={() => setIsCartOpen(false)}
-                      className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
-                    >
-                      Browse Collections
-                    </Link>
-                  </div>
-                )}
-              </div>
-
-              {/* Footer */}
-              <div className="p-6 border-t border-gray-100">
-                <div className="space-y-4 mb-6">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Subtotal</span>
-                    <span>$ {subtotal.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Shipping</span>
-                    <span className="text-green-600">Free</span>
-                  </div>
-                  <div className="pt-4 border-t border-gray-100">
-                    <div className="flex justify-between font-medium text-lg">
-                      <span>Total</span>
-                      <span>$ {total.toFixed(2)}</span>
-                    </div>
-                  </div>
-                </div>
-                <button 
-                  onClick={handleCheckout}
-                  className="w-full py-3 bg-gradient-to-r from-gray-900 to-gray-800 text-white rounded-lg hover:shadow-lg transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={cartItems.length === 0}
-                >
-                  {cartItems.length === 0 ? 'Bag is Empty' : 'Proceed to Checkout'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Enhanced Floating Cart Button - Always Visible */}
-      {!isCartOpen && (
-        <button
-          onClick={() => setIsCartOpen(true)}
-          className="fixed bottom-6 right-6 z-40 group"
-        >
-          <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 text-white p-4 rounded-xl shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105">
-            <div className="flex items-center gap-3">
-              <ShoppingBag size={20} />
-              <div className="text-left">
-                <div className="text-xs font-medium opacity-90">CART</div>
-                <div className="text-xs opacity-75">{cartItems.length} {cartItems.length === 1 ? 'item' : 'items'}</div>
-              </div>
-            </div>
-            {cartItems.length > 0 && (
-              <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center animate-bounce font-bold">
-                <span className="text-xs">{cartItems.length > 9 ? '9+' : cartItems.length}</span>
-              </div>
-            )}
-          </div>
-        </button>
-      )}
+           
 
      
     </div>

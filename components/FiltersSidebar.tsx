@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, X } from 'lucide-react';
 
 interface FiltersProps {
   onFilterChange: (filters: any) => void;
@@ -109,15 +109,79 @@ export default function FiltersSidebar({ onFilterChange, gender }: FiltersProps)
     setSelectedFilters({ brands: [], sizes: [], materials: [], colors: [] });
   };
 
+  // Check if any filters are selected
+  const hasActiveFilters = 
+    selectedFilters.brands.length > 0 ||
+    selectedFilters.sizes.length > 0 ||
+    selectedFilters.materials.length > 0 ||
+    selectedFilters.colors.length > 0;
+
+  // Get all active filter items
+  const activeFilters = [
+    ...selectedFilters.brands.map(b => ({ type: 'brand', value: b })),
+    ...selectedFilters.sizes.map(s => ({ type: 'size', value: s })),
+    ...selectedFilters.materials.map(m => ({ type: 'material', value: m })),
+    ...selectedFilters.colors.map(c => ({ type: 'color', value: c })),
+  ];
+
+  const removeFilter = (type: string, value: string) => {
+    if (type === 'brand') {
+      setSelectedFilters(prev => ({
+        ...prev,
+        brands: prev.brands.filter(b => b !== value)
+      }));
+    } else if (type === 'size') {
+      setSelectedFilters(prev => ({
+        ...prev,
+        sizes: prev.sizes.filter(s => s !== value)
+      }));
+    } else if (type === 'material') {
+      setSelectedFilters(prev => ({
+        ...prev,
+        materials: prev.materials.filter(m => m !== value)
+      }));
+    } else if (type === 'color') {
+      setSelectedFilters(prev => ({
+        ...prev,
+        colors: prev.colors.filter(c => c !== value)
+      }));
+    }
+  };
+
   return (
     <div className="w-full bg-white rounded-2xl p-8 shadow-soft">
-      {/* Reset Button */}
-      <button
-        onClick={resetFilters}
-        className="w-full mb-8 py-3 border-2 border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors text-sm tracking-widest font-light"
-      >
-        RESET FILTERS
-      </button>
+      {/* Active Filters Display */}
+      {hasActiveFilters && (
+        <div className="mb-6">
+          <div className="flex flex-wrap gap-1.5">
+            {activeFilters.map((filter, index) => (
+              <div
+                key={`${filter.type}-${filter.value}-${index}`}
+                className="inline-flex items-center gap-1 bg-gray-900 text-white px-2.5 py-1 rounded-full text-xs"
+              >
+                <span>{filter.value}</span>
+                <button
+                  onClick={() => removeFilter(filter.type, filter.value)}
+                  className="hover:bg-gray-800 rounded-full p-0.5 transition-colors"
+                  title="Remove filter"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Reset Button - Only show if filters are active */}
+      {hasActiveFilters && (
+        <button
+          onClick={resetFilters}
+          className="w-full mb-8 py-3 border-2 border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors text-sm tracking-widest font-light"
+        >
+          RESET ALL FILTERS
+        </button>
+      )}
 
       {/* Brand Filter */}
       <div className="mb-8 border-b border-gray-100 pb-8">
