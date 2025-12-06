@@ -293,13 +293,13 @@ export default function ProfilePage() {
                   </span>
                 </button>
                 
-                <Link
+                {/* <Link
                   href="/orders"
                   className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 transition-all"
                 >
                   <Package size={20} />
                   <span className="font-medium">My Orders</span>
-                </Link>
+                </Link> */}
                 
                 <button
                   onClick={() => setActiveTab('settings')}

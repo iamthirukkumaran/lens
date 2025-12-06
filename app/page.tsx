@@ -687,7 +687,7 @@ export default function Home() {
             </Link>
             <Link 
               href="/collections"
-              className="px-8 py-4 border-2 border-gray-900 text-gray-900 rounded-xl hover:bg-gray-900 hover:text-white transition-all duration-500 font-medium"
+              className="px-8 py-4 border-2 border-gray-900 text-gray-900 rounded-xl  hover:bg-gray-900 hover:text-white transition-all duration-500 font-medium"
             >
               Browse Collections
             </Link>
